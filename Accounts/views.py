@@ -3,12 +3,13 @@ from django.http import HttpRequest, JsonResponse, HttpResponse
 from json import loads
 from re import match
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 
 # Create your views here.
 
 def Register_API(request:HttpRequest):
     if request.user.is_authenticated:
-        return JsonResponce({"message":"Is authenticated"},status=401)
+        return JsonResponse({"message":"Is authenticated"},status=401)
     if not request.method == "POST":
         return HttpResponse({"message":"Request is not using POST Method."},status=405)
     
@@ -23,12 +24,30 @@ def Register_API(request:HttpRequest):
     if User.objects.filter(username=HTTP_Data["Email"]).exists():
         return HttpResponse({"message":"Email already exists."},status=409)
 
-    User(username=HTTP_Data["Email"], password=HTTP_Data["Password"]).save()
+    U = User(username=HTTP_Data["Email"])
+    U.set_password(HTTP_Data["Password"])
+    U.save()
     return JsonResponse({"message":"Created."},status=201)
 
-def Login_API(request:HttpRequest):
-    pass
+def Login_API(request:HttpRequest): # Receive: All Data + if(patient) FormMed + Group
+    if request.user.is_authenticated:
+        return JsonResponse({"message":"User already logged in"}, status=401)
+    if not request.method == "POST":
+        return JsonResponse({"message":"Request is not using POST Method."}, status=405)
+    
+    HTTP_Data = loads(request.body)
+
+    if authenticate(username=HTTP_Data["Email"], password=HTTP_Data["Password"]) is None:
+        return JsonResponse({"message":"Email or password incorrect"}, status=401)
+    else:
+        return JsonResponse({"message":"Done."}, status=200)
 
 def Account_Profile_API(request:HttpRequest):
+    pass
+
+def tickets_API(request:HttpRequest):
+    pass
+
+def teapot_API(request:HttpRequest):
     pass
     
