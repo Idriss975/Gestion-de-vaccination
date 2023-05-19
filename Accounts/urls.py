@@ -14,13 +14,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-from django.http import HttpResponse
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("", ensure_csrf_cookie(lambda _ : HttpResponse())),
-    path("Account/", include("Accounts.urls"))
+    path("Register/", views.Register_API, name="Account_Register"),
 ]
