@@ -94,8 +94,11 @@ class Test_Account_views(TestCase):
         }
         Patients = Group.objects.get(name="Patient")
         Nurses = Group.objects.get(name="Nurse")
-        P = User(username=Patients_Login_Data["username"], password=Patients_Login_Data["password"])
-        N = User(username=Nurses_Login_Data["username"], password=Nurses_Login_Data["password"])
+        P = User(username=Patients_Login_Data["username"])
+        P.set_password(Patients_Login_Data["password"])
+        P.save()
+        N = User(username=Nurses_Login_Data["username"])
+        N.set_password(Nurses_Login_Data["password"])
         P.save()
         N.save()
         P.groups.set(Patients)
