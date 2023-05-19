@@ -18,9 +18,17 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
+from . import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", ensure_csrf_cookie(lambda _ : HttpResponse())),
-    path("Account/", include("Accounts.urls"))
+    path("account/", include("Accounts.urls")),
+    
+    path("", views.Main_Page, name="Main_Page"),
+    path("login/", views.Login_Page, name="Login_Page"),
+    path("register/", views.Register_Page, name="Register_Page"),
+    path("404/", views.N404_Page, name="404"),
+
 ]
+
+#handler404 = "Gestion_de_vaccination.views.N404_Page"
