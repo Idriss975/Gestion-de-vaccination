@@ -25,7 +25,7 @@ def Register_API(request:HttpRequest):
     if User.objects.filter(username=HTTP_Data["Email"]).exists():
         return HttpResponse({"message":"Email already exists."},status=409)
 
-    U = User(username=HTTP_Data["Email"])
+    U = User(username=HTTP_Data["Email"], is_active=True)
     U.set_password(HTTP_Data["Password"])
     U.save()
     Person(User = U).save()
