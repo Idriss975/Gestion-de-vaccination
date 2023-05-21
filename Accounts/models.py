@@ -3,12 +3,12 @@ from django.conf import settings
 
 # Create your models here.
 class Person(models.Model):
-    CIN = models.CharField(max_length=9, null=True)
-    Nom = models.CharField(max_length=20, null=True)
-    Prenom = models.CharField(max_length=40, null=True)
-    tel = models.CharField(max_length=13, null=True)
-    address = models.CharField(max_length=50, null=True)
-    Bday = models.DateField( null=True)
+    CIN = models.CharField(max_length=9, null=True, blank=True)
+    Nom = models.CharField(max_length=20, null=True, blank=True)
+    Prenom = models.CharField(max_length=40, null=True, blank=True)
+    tel = models.CharField(max_length=13, null=True, blank=True)
+    address = models.CharField(max_length=50, null=True, blank=True)
+    Bday = models.DateField( null=True, blank=True)
     User = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     Specialization = models.CharField(max_length=30,blank=True, null=True)
 
@@ -26,4 +26,4 @@ class Medical_Form(models.Model):
     Weigth = models.FloatField(null=True)
     Blood_type = models.CharField(max_length=2, null=True)
     Patient = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    Allergies = models.ManyToManyField(Allergies, null=True)
+    Allergies = models.ManyToManyField(Allergies)
