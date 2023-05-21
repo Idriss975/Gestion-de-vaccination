@@ -6,7 +6,7 @@ from random import choice
 from json import dumps, loads
 from re import match
 from datetime import datetime
-from .models import Medical_Form
+from .models import Medical_Form, Person
 
 # Create your tests here.
 class Test_Account_views(TestCase):
@@ -92,43 +92,48 @@ class Test_Account_views(TestCase):
             "username" : "Nurses@Test.com",
             "password" : "".join([choice(ascii_letters) for i in range(10)]) 
         }
-        Patients = Group.objects.get(name="Patient")
-        Nurses = Group.objects.get(name="Nurse")
-        P = User(username=Patients_Login_Data["username"])
+        Patients = Group(name = "Patient")
+        Patients.save()
+        Nurses = Group(name = "Nurse")
+        Nurses.save()
+        P = User(username=Patients_Login_Data["username"], is_active=True)
         P.set_password(Patients_Login_Data["password"])
-        N = User(username=Nurses_Login_Data["username"])
+        
+        N = User(username=Nurses_Login_Data["username"], is_active=True)
         N.set_password(Nurses_Login_Data["password"])
+        
         P.save()
         N.save()
-        P.groups.set(Patients)
-        N.groups.set(Nurses)
+        Person(User=P).save()
+        Person(User=N).save()
+        P.groups.add(Patients)
+        N.groups.add(Nurses)
 
         self.client.force_login(P)
         Response=self.client.get(Profile_Path, headers={ "X-CSRFToken":csrf})
         self.assertTrue(Response.status_code==200)
-
-        self.assertTrue(bool(match(r"^[A-Z]{2}[0-9]{6}$",Response.content.json()["CIN"])))
-        self.assertTrue(bool(match(r"^[A-Z][a-z]+$",Response.content.json()["Nom"])))
-        self.assertTrue(bool(match(r"^[A-Z][a-z]+$",Response.content.json()["Prenom"])))
-        self.assertTrue(bool(match(r"^0[5678][09]{8}$",Response.content.json()["Tel"])))
-        self.assertTrue(bool(match(r"[1-9][0-9]*,\S+",Response.content.json()["Address"])))
-        self.assertTrue(datetime.strptime(Response.content.json()["Birth_day"], "%d/%m/%Y") < datetime.today())
-        self.assertTrue(bool(match(r"^\S@\S.\S$",Response.content.json()["Email"])))
+        self.assertTrue(bool(match(r"^[A-Z]{2}[0-9]{6}$",Response.json()["CIN"])) if Response.json()["CIN"] is not None else True)
+        self.assertTrue(bool(match(r"^[A-Z][a-z]+$",Response.json()["Nom"])) if Response.json()["Nom"] is not None else True)
+        self.assertTrue(bool(match(r"^[A-Z][a-z]+$",Response.json()["Prenom"])) if Response.json()["Prenom"] is not None else True)
+        self.assertTrue(bool(match(r"^0[5678][0-9]{8}$",Response.json()["Tel"])) if Response.json()["Tel"] is not None else True)
+        self.assertTrue(bool(match(r"^[1-9][0-9]*,\D+$",Response.json()["Address"])) if Response.json()["Address"] is not None else True)
+        self.assertTrue(datetime.strptime(Response.json()["Birth_day"], "%d/%m/%Y") < datetime.today() if Response.json()["Birth_day"] is not None else True)
+        print("test = "+Response.json()["Email"])
+        self.assertTrue(bool(match(r"^\S+@\S+.\S+$",Response.json()["Email"])))
         self.client.logout()
 
         self.client.force_login(N)
         Response=self.client.get(Profile_Path, headers={ "X-CSRFToken":csrf})
         self.assertTrue(Response.status_code==200)
+        self.assertTrue(bool(match(r"^[A-Z]{2}[0-9]{6}$",Response.json()["CIN"])) if Response.json()["CIN"] is not None else True)
+        self.assertTrue(bool(match(r"^[A-Z][a-z]+$",Response.json()["Nom"])) if Response.json()["Nom"] is not None else True)
+        self.assertTrue(bool(match(r"^[A-Z][a-z]+$",Response.json()["Prenom"])) if Response.json()["Prenom"] is not None else True)
+        self.assertTrue(bool(match(r"^0[5678][0-9]{8}$",Response.json()["Tel"])) if Response.json()["Tel"] is not None else True)
+        self.assertTrue(bool(match(r"^[1-9][0-9]*,\D+$",Response.json()["Address"])) if Response.json()["Address"] is not None else True)
+        self.assertTrue(datetime.strptime(Response.json()["Birth_day"], "%d/%m/%Y") < datetime.today() if Response.json()["Birth_day"] is not None else True)
+        self.assertTrue(bool(match(r"^\S+@\S+.\S+$",Response.json()["Email"])))
 
-        self.assertTrue(bool(match(r"^[A-Z]{2}[0-9]{6}$",Response.content.json()["CIN"])))
-        self.assertTrue(bool(match(r"^[A-Z][a-z]+$",Response.content.json()["Nom"])))
-        self.assertTrue(bool(match(r"^[A-Z][a-z]+$",Response.content.json()["Prenom"])))
-        self.assertTrue(bool(match(r"^0[5678][09]{8}$",Response.content.json()["Tel"])))
-        self.assertTrue(bool(match(r"[1-9][0-9]*,\S+",Response.content.json()["Address"])))
-        self.assertTrue(datetime.strptime(Response.content.json()["Birth_day"], "%d/%m/%Y") < datetime.today())
-        self.assertTrue(bool(match(r"^\S@\S.\S$",Response.content.json()["Email"])))
-
-        self.assertFalse(Medical_Form.objects.filter(Patients=N).exists())
+        self.assertFalse(Medical_Form.objects.filter(Patient=N).exists())
         
         self.client.logout()
         

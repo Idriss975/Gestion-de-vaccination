@@ -3,6 +3,7 @@ from django.http import HttpRequest, JsonResponse, HttpResponse
 from json import loads
 from re import match
 from django.contrib.auth.models import User
+from .models import Person
 from django.contrib.auth import authenticate
 
 # Create your views here.
@@ -27,9 +28,11 @@ def Register_API(request:HttpRequest):
     U = User(username=HTTP_Data["Email"])
     U.set_password(HTTP_Data["Password"])
     U.save()
+    Person(User = U).save()
+
     return JsonResponse({"message":"Created."},status=201)
 
-def Login_API(request:HttpRequest): # Receive: All Data + if(patient) FormMed + Group
+def Login_API(request:HttpRequest):
     if request.user.is_authenticated:
         return JsonResponse({"message":"User already logged in"}, status=401)
     if not request.method == "POST":
@@ -42,12 +45,33 @@ def Login_API(request:HttpRequest): # Receive: All Data + if(patient) FormMed + 
     else:
         return JsonResponse({"message":"Done."}, status=200)
 
-def Account_Profile_API(request:HttpRequest):
-    pass
+def Account_Profile_API(request:HttpRequest):  # Receive: All Data + if(patient) FormMed + Group
+    if not request.user.is_authenticated:
+        return JsonResponse({"message":"User is not authenticated."},status=501)
+    if not request.method == "GET":
+        return JsonResponse({"message":"Request is not using GET Method."},status=405)
+
+    P = Person.objects.get(User = request.user)
+    print(request.user.username)
+    return JsonResponse({
+        "Email" : request.user.username,
+        "CIN" : P.CIN,
+        "Nom" : P.Nom,
+        "Prenom" : P.Prenom,
+        "Tel" : P.tel,
+        "Address" : P.address,
+        "Birth_day" : P.Bday.strftime("%d/%m/%Y") if P.Bday is not None else None,
+    })
 
 def tickets_API(request:HttpRequest):
     pass
 
 def teapot_API(request:HttpRequest):
+    pass
+
+def Get_Medical_form_API(request:HttpRequest):
+    pass
+
+def Modify_Medical_form_API(request:HttpRequest):
     pass
     
