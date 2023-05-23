@@ -3,7 +3,7 @@ from django.http import HttpRequest, JsonResponse, HttpResponse
 from json import loads
 from re import match
 from django.contrib.auth.models import User
-from .models import Person
+from .models import Person, Medical_Form
 from django.contrib.auth import authenticate
 
 # Create your views here.
@@ -47,7 +47,7 @@ def Login_API(request:HttpRequest):
 
 def Account_Profile_API(request:HttpRequest):  # Receive: All Data + if(patient) FormMed + Group
     if not request.user.is_authenticated:
-        return JsonResponse({"message":"User is not authenticated."},status=501)
+        return JsonResponse({"message":"User is not authenticated."},status=401)
     if not request.method == "GET":
         return JsonResponse({"message":"Request is not using GET Method."},status=405)
 
@@ -63,15 +63,43 @@ def Account_Profile_API(request:HttpRequest):  # Receive: All Data + if(patient)
         "Birth_day" : P.Bday.strftime("%d/%m/%Y") if P.Bday is not None else None,
     })
 
-def tickets_API(request:HttpRequest):
-    pass
-
 def teapot_API(request:HttpRequest):
-    pass
+    return JsonResponse({
+        "message":"iafb cydoeuf'grhei jrkelamdnionpgq,r sytouuv whxayvzeA BfCoDuEnFdG HtIhJeK LsMeNcOrPeQtR.S"[::2]
+        }, status=418)
 
 def Get_Medical_form_API(request:HttpRequest):
-    pass
+    if not request.user.is_authenticated:
+        return JsonResponse({"message":"User is not authenticated."},status=401)
+    if not request.method == "GET":
+        return JsonResponse({"message":"Request is not using GET Method."},status=405)
+    
+    if request.user.groups.filter(name="Patient").exists():
+        if Medical_Form.objects.filter(Patient = request.user).exists():
+            M=Medical_Form.objects.filter(Patient = request.user)
+            return JsonResponse({
+                "Height" : M.Heigth,
+                "Weight" : M.Weight,
+                "Blood_type" : M.Blood_type,
+                "Allergies" : [i.Name for i in M.all()[0].Allergies.all()]
+            },status=200)
+        else:
+            return JsonResponse({"message":"You do not have a Medical_Form."}, status=404)
+    elif request.user.groups.filter(name="Nurse").exists():
+        if request.GET.get("Email") is None:
+            return JsonResponse({"message" : "Unexpected format."}, status=400)
+        if not Medical_Form.objects.filter(Patient = User.objects.filter(username = request.GET.get("Email"))).exists():
+            return JsonResponse({"message":"Medical form not found."}, status=404)
+
+        M = Medical_Form.objects.filter(Patient = User.objects.filter(username = request.GET.get("Email"))).all()[0]
+        return JsonResponse({
+            "Height" : M.Heigth,
+            "Weight" : M.Weight,
+            "Blood_type" : M.Blood_type,
+            "Allergies" : [i.Name for i in M.all()[0].Allergies.all()]
+        }, status=200)
+    else:
+        return JsonResponse({"message": "User does not have Group"}, status=401)
 
 def Modify_Medical_form_API(request:HttpRequest):
     pass
-    
