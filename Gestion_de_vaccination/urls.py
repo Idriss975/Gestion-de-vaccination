@@ -22,12 +22,13 @@ from . import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("account/", include("Accounts.urls")),
-    
+    path("api/", include("Accounts.urls")),
+    path("api/", include("Ticket.urls")),
     path("", views.Main_Page, name="Main_Page"),
-    path("login/", views.Login_Page, name="Login_Page"),
-    path("register/", views.Register_Page, name="Register_Page"),
-    path("404/", views.N404_Page, name="404"),
+    path("api/login/", views.Login_Page, name="Login_Page"),
+    path("api/register/", views.Register_Page, name="Register_Page"),
+
+    #path("404/", views.N404_Page, name="404"),
 
 ]
 

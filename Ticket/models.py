@@ -12,7 +12,7 @@ class Vaccine(models.Model):
 class Ticket(models.Model):
     Time = models.DateTimeField()
     Location = models.CharField(max_length=50)
-    Status = models.CharField(max_length=9,choices=(("C","Created"), ("C","Confirmed"), ("C","Cancelled")))
+    Status = models.CharField(max_length=2,choices=(("Cr","Created"), ("Co","Confirmed"), ("Ca","Cancelled")))
     Vaccine = models.ForeignKey(Vaccine, on_delete=models.SET_NULL, null=True)
     Patient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="Patients",limit_choices_to={"groups_name":"Patient"})
     Nurses = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="Nurses",limit_choices_to={"groups_name":"Nurse"})

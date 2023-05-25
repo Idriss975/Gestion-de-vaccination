@@ -151,7 +151,8 @@ def Modify_Medical_form_API(request:HttpRequest):
         if "Blood_type" in HTTP_data:
             if HTTP_data["Blood_type"] is not None:
                 M.Allergies.clear()
-                M.Allergies.add(*HTTP_data["Allergies"])
+                for i in HTTP_data["Allergies"]:
+                    M.Allergies.create(Name=i)
         return JsonResponse({"message" : "Done."}, status=200)
     else:
         return JsonResponse({"message": "User does not have Group"}, status=401)
