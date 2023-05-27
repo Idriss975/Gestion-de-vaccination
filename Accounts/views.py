@@ -76,7 +76,7 @@ def Get_Medical_form_API(request:HttpRequest):
     
     if request.user.groups.filter(name="Patient").exists():
         if Medical_Form.objects.filter(Patient = request.user).exists():
-            M=Medical_Form.objects.filter(Patient = request.user)
+            M=Medical_Form.objects.filter(Patient = request.user).all()[0]
             return JsonResponse({
                 "Height" : M.Heigth,
                 "Weight" : M.Weight,
