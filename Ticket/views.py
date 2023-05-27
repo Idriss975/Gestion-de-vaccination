@@ -40,8 +40,9 @@ def Cancel_tickets_API(request:HttpRequest):
     if not models.Ticket.objects.filter(id = HTTP_DATA["id"]).exists():
         return JsonResponse({"message":"Ticket doesn't exist"}, status=404)
     T = models.Ticket.objects.get(id = HTTP_DATA["id"])
-    T.delete()
+    T.Status = "Ca"
     T.save()
+    return JsonResponse({"message": "Done."}, status=200)
     
 def Participate_ticket_API(request:HttpRequest):
     if not request.user.is_authenticated:
