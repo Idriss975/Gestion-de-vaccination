@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpRequest, JsonResponse, HttpResponse
 from json import loads
 from re import match
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from .models import Person, Medical_Form
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login 
+
 
 # Create your views here.
 
@@ -16,7 +17,7 @@ def Register_API(request:HttpRequest):
     
     HTTP_Data = loads(request.body)
 
-    if not "Email" in HTTP_Data or not "Password" in HTTP_Data or len(HTTP_Data.keys()) != 2:
+    if not "Email" in HTTP_Data or not "Password" in HTTP_Data or len(HTTP_Data.keys()) != 3:
         return JsonResponse({"message":"Json data must contain Email and Password keys."},status=400)
 
     if not bool(match(r"^\S+@\S+.[a-zA-Z]+", HTTP_Data["Email"])):
@@ -27,6 +28,8 @@ def Register_API(request:HttpRequest):
 
     U = User(username=HTTP_Data["Email"], is_active=True)
     U.set_password(HTTP_Data["Password"])
+    U.save()
+    U.groups.add(Group.objects.get(name=HTTP_Data["Group"]))
     U.save()
     Person(User = U).save()
 
@@ -40,9 +43,11 @@ def Login_API(request:HttpRequest):
     
     HTTP_Data = loads(request.body)
 
-    if authenticate(username=HTTP_Data["Email"], password=HTTP_Data["Password"]) is None:
+    U = authenticate(username=HTTP_Data["Email"], password=HTTP_Data["Password"])
+    if U  is None:
         return JsonResponse({"message":"Email or password incorrect"}, status=401)
     else:
+        login(request, U)
         return JsonResponse({"message":"Done."}, status=200)
 
 def Account_Profile_API(request:HttpRequest):  # Receive: All Data + if(patient) FormMed + Group

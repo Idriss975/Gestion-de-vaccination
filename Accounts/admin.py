@@ -8,7 +8,7 @@ from django.contrib.auth.admin import UserAdmin
 class AccountInline(admin.StackedInline):
     model = Person
     can_delete = False
-    verbose_name_plural = 'Person'
+    verbose_name_plural = 'Persons'
 
 class AccountInline2(admin.StackedInline):
     model = Medical_Form

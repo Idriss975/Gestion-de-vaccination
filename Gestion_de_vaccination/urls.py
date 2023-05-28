@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from django.http import HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from . import views
@@ -25,11 +27,7 @@ urlpatterns = [
     path("api/", include("Accounts.urls")),
     path("api/", include("Ticket.urls")),
     path("", views.Main_Page, name="Main_Page"),
-    path("api/login/", views.Login_Page, name="Login_Page"),
-    path("api/register/", views.Register_Page, name="Register_Page"),
-
-    #path("404/", views.N404_Page, name="404"),
-
-]
-
-#handler404 = "Gestion_de_vaccination.views.N404_Page"
+    path("login/", views.Login_Page, name="Login_Page"),
+    path("register/", views.Register_Page, name="Register_Page"),
+    path("profile/", views.Profile, {"next_page": "/"}, name="Profile"),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
