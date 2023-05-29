@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="{% static 'enregistrer.css' %}">
+</head>
+<body>
+  <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+  <div class="container">
+    <h1>Enregistrement</h1>
+  <div class="f">
+      <label for="email">Email :</label>
+      <input type="email" id="email" name="email" placeholder="Entrez votre email" required>
+
+      <label for="password">Mot de passe :</label>
+      <input type="password" id="password" name="password" placeholder="Entrez votre mot de passe" required>
+      <div>
+        <input type="radio"name="r" id="idp" value="patient" checked> 
+        <label for="idp">Patient</label>
+        <input type="radio"name="r" id="idm" value="infirmier">
+        <label for="idm">medecin</label>
+        
+    </div>
+      <input id="subm" type="submit" value="S'inscrire" >
+  </div>
+  <script src="{% static 'enrg.js' %}"></script>
+</body>
+</html>
