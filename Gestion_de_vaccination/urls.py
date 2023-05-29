@@ -29,5 +29,5 @@ urlpatterns = [
     path("", views.Main_Page, name="Main_Page"),
     path("login/", views.Login_Page, name="Login_Page"),
     path("register/", views.Register_Page, name="Register_Page"),
-    path("profile/", views.Profile, {"next_page": "/"}, name="Profile"),
+    path("profile/", views.Profile, name="Profile"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
